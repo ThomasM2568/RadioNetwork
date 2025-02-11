@@ -1,16 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pick a Location</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        #map {
+            height: 500px;
+            width: 80%;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        form {
+            margin-top: 20px;
+        }
+        button {
+            background: linear-gradient(45deg, #007BFF, #0056b3);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease-in-out;
+            transform: scale(1);
+        }
+        button:hover {
+            transform: scale(1.1);
+            background: linear-gradient(45deg, #0056b3, #003d80);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+    </style>
 </head>
 <body>
     <h1>Click on the Map to Select a Location</h1>
     <form action="/result" method="POST">
         <input type="hidden" id="lat" name="lat">
         <input type="hidden" id="lon" name="lon">
-        <div id="map" style="height: 400px;"></div>
+        <div id="map"></div>
         <br>
         <button type="submit">Get Data</button>
     </form>
@@ -19,12 +61,20 @@
         var map = L.map('map').setView([0, 0], 2);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        var marker;
+        var marker, circle;
         map.on('click', function(e) {
             if (marker) {
                 map.removeLayer(marker);
+                map.removeLayer(circle);
             }
             marker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+            circle = L.circle([e.latlng.lat, e.latlng.lng], {
+                color: 'blue',
+                fillColor: '#007BFF',
+                fillOpacity: 0.3,
+                radius: 2000  // 2 km radius
+            }).addTo(map);
+
             document.getElementById("lat").value = e.latlng.lat;
             document.getElementById("lon").value = e.latlng.lng;
         });
