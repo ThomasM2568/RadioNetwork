@@ -1,13 +1,213 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Weather Data</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5G Antenna Configuration Result</title>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- Leaflet.js (Carte) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            width: 100%;
+            margin: auto;
+        }
+
+        /* Left Section: Environmental Data */
+        .left-section {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 30%;
+            display: flex;
+            flex-direction: column;
+            height: auto;
+        }
+
+        /* Right Section: Antenna Configuration + Map */
+        .right-section {
+            flex: 2;
+            margin-left: 20px;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: auto;
+        }
+
+        /* Titre au-dessus de la carte */
+        .title-container {
+            background: white;
+            width: 100%;
+            text-align: center;
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            border-bottom: 2px solid #ccc;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Map Section */
+        .map-container {
+            width: 100%;
+            flex-grow: 1;
+            height: 100%;
+            background: transparent !important; /* Suppression du fond gris */
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            background: transparent !important;
+        }
+
+        /* Résultats affichés sur la carte */
+        .config-results {
+            position: absolute;
+            top: 45%;
+            left: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000; /* Premier plan */
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 10px;
+            margin: 0;
+        }
+
+        li {
+            margin: 8px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        li i {
+            margin-right: 10px;
+            color: #007BFF;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        a:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>Location: ({{ lat }}, {{ lon }})</h1>
-    <h2>Weather Data:</h2>
-    <p>Temperature: {{ weather.temperature }}°C</p>
-    <p>Wind Speed: {{ weather.windspeed }} km/h</p>
-    <a href="/">Pick Another Location</a>
+    <div class="container">
+        
+        <!-- Left Section: Environmental Data -->
+        <div class="left-section">
+            <h1><i class="fa-solid fa-broadcast-tower"></i> 5G Antenna Configuration</h1>
+            
+            <ul>
+                <li><i class="fa-solid fa-location-dot"></i> <strong>Latitude:</strong> {{ lat }}</li>
+                <li><i class="fa-solid fa-location-dot"></i> <strong>Longitude:</strong> {{ lon }}</li>
+                <li><i class="fa-solid fa-building"></i> <strong>Building Density:</strong> {{ building_density }}</li>
+                <li><i class="fa-solid fa-tree"></i> <strong>Land Type:</strong> {{ land_type }}</li>
+                <li><i class="fa-solid fa-mountain"></i> <strong>Nearby Mountains:</strong> {{ "Yes" if mountains else "No" }}</li>
+                <li><i class="fa-solid fa-mountain-sun"></i> <strong>Elevation:</strong> {{ elevation }} m</li>
+                <li><i class="fa-solid fa-road"></i> <strong>Average Road Speed:</strong> {{ avg_speed }} km/h</li>
+            </ul>
+            
+            <a href="/"><i class="fa-solid fa-arrow-left"></i> Return to Home</a>
+        </div>
+
+        <!-- Right Section: Antenna Configuration with Map -->
+        <div class="right-section">
+            <!-- Title Section -->
+            <div class="title-container">
+                <i class="fa-solid fa-signal"></i> Recommended Antenna Configuration
+            </div>
+
+            <!-- Map Below Title -->
+            <div class="map-container">
+                <div id="map"></div>
+
+                <!-- Config Results on Map -->
+                <div class="config-results">
+                    <ul>
+                        <li><i class="fa-solid fa-wifi"></i> <strong>Frequency:</strong> {{ antenna_config["Frequency"] }}</li>
+                        <li><i class="fa-solid fa-broadcast-tower"></i> <strong>Subcarrier Size:</strong> {{ antenna_config["Subcarrier Size"] }}</li>
+                        <li><i class="fa-solid fa-sync-alt"></i> <strong>Cyclic Prefix Mode:</strong> {{ antenna_config["Cyclic Prefix Mode"] }}</li>
+                        <li><i class="fa-solid fa-bolt"></i> <strong>Output Power:</strong> {{ antenna_config["Output Power"] }}</li>
+                        <li><i class="fa-solid fa-ruler-combined"></i> <strong>Coverage Radius:</strong> {{ antenna_config["Coverage Radius"] }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript to Initialize the Map -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var map = L.map('map', {
+                center: [{{ lat }}, {{ lon }}],
+                zoom: 13,
+                dragging: false,
+                zoomControl: false,
+                scrollWheelZoom: false,
+                doubleClickZoom: false,
+                touchZoom: false
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            var coverageRadius = parseFloat("{{ antenna_config['Coverage Radius'] }}".split(' ')[0]) * 1000;
+
+            L.circle([{{ lat }}, {{ lon }}], {
+                color: "orange",
+                fillColor: "orange",
+                fillOpacity: 0.4,
+                radius: coverageRadius
+            }).addTo(map);
+
+            L.marker([{{ lat }}, {{ lon }}]).addTo(map)
+                .bindPopup("<b>Antenna Location</b><br>Coverage: {{ antenna_config['Coverage Radius'] }}")
+                .openPopup();
+        });
+    </script>
 </body>
 </html>
