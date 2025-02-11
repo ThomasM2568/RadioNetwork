@@ -8,7 +8,7 @@
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-    <!-- Leaflet.js (Carte) -->
+    <!-- Leaflet.js for Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -29,7 +29,6 @@
             margin: auto;
         }
 
-        /* Left Section: Environmental Data */
         .left-section {
             flex: 1;
             background: white;
@@ -42,7 +41,6 @@
             height: auto;
         }
 
-        /* Right Section: Antenna Configuration + Map */
         .right-section {
             flex: 2;
             margin-left: 20px;
@@ -56,7 +54,6 @@
             height: auto;
         }
 
-        /* Titre au-dessus de la carte */
         .title-container {
             background: white;
             width: 100%;
@@ -69,12 +66,11 @@
             z-index: 10;
         }
 
-        /* Map Section */
         .map-container {
             width: 100%;
             flex-grow: 1;
             height: 100%;
-            background: transparent !important; /* Suppression du fond gris */
+            background: transparent !important;
         }
 
         #map {
@@ -83,7 +79,6 @@
             background: transparent !important;
         }
 
-        /* Résultats affichés sur la carte */
         .config-results {
             position: absolute;
             top: 45%;
@@ -92,7 +87,7 @@
             padding: 15px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000; /* Premier plan */
+            z-index: 1000;
         }
 
         ul {
@@ -135,7 +130,6 @@
 <body>
     <div class="container">
         
-        <!-- Left Section: Environmental Data -->
         <div class="left-section">
             <h1><i class="fa-solid fa-broadcast-tower"></i> 5G Antenna Configuration</h1>
             
@@ -152,18 +146,14 @@
             <a href="/"><i class="fa-solid fa-arrow-left"></i> Return to Home</a>
         </div>
 
-        <!-- Right Section: Antenna Configuration with Map -->
         <div class="right-section">
-            <!-- Title Section -->
             <div class="title-container">
                 <i class="fa-solid fa-signal"></i> Recommended Antenna Configuration
             </div>
 
-            <!-- Map Below Title -->
             <div class="map-container">
                 <div id="map"></div>
 
-                <!-- Config Results on Map -->
                 <div class="config-results">
                     <ul>
                         <li><i class="fa-solid fa-wifi"></i> <strong>Frequency:</strong> {{ antenna_config["Frequency"] }}</li>
@@ -178,7 +168,6 @@
 
     </div>
 
-    <!-- JavaScript to Initialize the Map -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var map = L.map('map', {
